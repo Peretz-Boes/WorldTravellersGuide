@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">WorldTraveller\'sGuide</string>
+    <string name="action_settings">Settings</string>
+    <string name="internet_connection_message">No internet service is available</string>
+    <string name="enter_city_message">Enter city to search</string>
+    <string name="place_item_content_description">Venue in or near the location you entered</string>
+    <string name="location_permission_explanation_message">You need to allow fine location to be accessed in order to search based on your location</string>
+    <string name="search_by_city_button_text">Search for venus by city name</string>
+    <string name="search_by_latitude_and_longitude_button_text">Search for venues by latitude and longitude</string>
+    <string name="location_error_message">Unable to get location information</string>
+    <string name="ad_unit_id">tba</string>
+    <string name="open_venue_in_map_button_text">Open venue in map</string>
+    <string name="title_activity_saved_locations">SavedLocationsActivity</string>
+    <string name="title_activity_maps">Map</string>
+</resources>
