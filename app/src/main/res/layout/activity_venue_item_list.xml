@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fitsSystemWindows="true"
+                tools:context="com.example.android.worldtravellersguide.VenueItemListActivity">
+
+    <RelativeLayout
+        android:id="@+id/searchBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:padding="10dp">
+
+        <EditText
+            android:id="@+id/searchInputEditor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:hint="Enter search term"
+            android:padding="3dp"/>
+
+        <EditText
+            android:id="@+id/nearbyEditor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/searchInputEditor"
+            android:layout_marginTop="3dp"
+            android:background="@android:color/white"
+            android:hint="Near me"
+            android:padding="3dp"/>
+
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/searchBarLayout">
+
+        <include layout="@layout/venue_item_list_content"/>
+    </FrameLayout>
+
+
+</RelativeLayout>

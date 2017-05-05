@@ -12,4 +12,6 @@
     <string name="open_venue_in_map_button_text">Open venue in map</string>
     <string name="title_activity_saved_locations">SavedLocationsActivity</string>
     <string name="title_activity_maps">Map</string>
+    <string name="foursquare_client_id" templateMergeStrategy="preserve" translatable="false">LE1LKPJZWSPNQVVEQEYI0A24DEH54KZVVIT1WI1CB3GOUJVT</string>
+    <string name="foursquare_client_secret" templateMergeStrategy="preserve" translatable="false">WCFHNL3KMOBJH5QRREUQZ3FFAQLV10KRUJ445LCBROYESFPN</string>
 </resources>
