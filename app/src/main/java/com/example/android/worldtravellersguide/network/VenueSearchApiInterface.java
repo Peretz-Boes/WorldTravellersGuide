@@ -11,6 +11,8 @@ import retrofit2.http.Query;
  */
 
 public interface VenueSearchApiInterface {
-    @GET("venues/search?v=20160504&limit=20")
-    Call<FoursquareRootJSON>searchVenue(@Query("client_id") String clientID,@Query("client_secret") String clientSecret,@Query("query") String query,@Query("near") String near,@Query("ll")String ll,@Query("llAcc")double llAcc);
+    @GET("venus/recommendations?v=20160504")
+    Call<FoursquareRootJSON>searchVenueNearCity(@Query("client_id") String clientID, @Query("client_secret") String clientSecret, @Query("query") String query, @Query("near") String near);
+    @GET("venus/recommendations?v=20160504")
+    Call<FoursquareRootJSON>searchVenueNearMe(@Query("client_id") String clientID, @Query("client_secret") String clientSecret, @Query("query") String query, @Query("ll") String ll, @Query("llAcc") double llAcc);
 }

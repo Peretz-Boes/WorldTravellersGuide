@@ -25,7 +25,7 @@ public class VenueItemDetailActivity extends AppCompatActivity {
         }
         if (savedInstanceState == null) {
             Bundle arguments = new Bundle();
-            arguments.putString(VenueItemDetailFragment.ARG_ITEM_ID, getIntent().getStringExtra(VenueItemDetailFragment.ARG_ITEM_ID));
+            arguments.putSerializable(VenueItemDetailFragment.ARG_ITEM_ID,getIntent().getSerializableExtra(VenueItemDetailFragment.ARG_ITEM_ID));
             VenueItemDetailFragment fragment = new VenueItemDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()

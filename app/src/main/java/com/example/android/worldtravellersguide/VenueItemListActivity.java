@@ -6,8 +6,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -21,18 +24,28 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.android.worldtravellersguide.model.FoursquareVenue;
+import com.example.android.worldtravellersguide.model.FourSquareResults;
+import com.example.android.worldtravellersguide.model.FoursquareRootJSON;
+import com.example.android.worldtravellersguide.network.RetroApiClient;
+import com.example.android.worldtravellersguide.network.VenueSearchApiInterface;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.os.Build.VERSION.SDK_INT;
 
@@ -45,6 +58,9 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
     private boolean isConnected=false;
     private ProgressDialog progressDialog;
     private Timer searchDelayTimer;
+    private EditText searchTextEditor;
+    private EditText nearbyEditor;
+    private SimpleItemRecyclerViewAdapter simpleItemRecyclerViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +75,10 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
             mTwoPane = true;
         }
 
+        searchTextEditor=(EditText)findViewById(R.id.searchInputEditor);
+        nearbyEditor=(EditText)findViewById(R.id.nearbyEditor);
+        searchTextEditor.addTextChangedListener(new SearchTextWatcher());
+
         if(SDK_INT>=Build.VERSION_CODES.M){
             handleRuntimePermission();
         }
@@ -67,8 +87,21 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
 
     }
 
+    @Override
+    protected void onStart() {
+        googleApiClient.connect();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        googleApiClient.disconnect();
+        super.onStop();
+    }
+
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(new ArrayList<FoursquareVenue>()));
+        simpleItemRecyclerViewAdapter=new SimpleItemRecyclerViewAdapter(new ArrayList<FourSquareResults>());
+        recyclerView.setAdapter(simpleItemRecyclerViewAdapter);
     }
 
     @Override
@@ -94,7 +127,7 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
             searchDelayTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-
+                    doSearchApiCallToFoursquare(inputText);
                 }
             },500);
         }
@@ -111,9 +144,9 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
     }
 
     public class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
-        private final List<FoursquareVenue> mValues;
+        private List<FourSquareResults> mValues;
 
-        public SimpleItemRecyclerViewAdapter(List<FoursquareVenue> items) {
+        public SimpleItemRecyclerViewAdapter(List<FourSquareResults> items) {
             mValues = items;
         }
 
@@ -125,12 +158,26 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
+            final FourSquareResults fourSquareResults=mValues.get(position);
+            if (fourSquareResults.venue!=null){
+                holder.itemNameView.setText(fourSquareResults.venue.name);
+                holder.itemAddressView.setText(fourSquareResults.venue.location.address);
+                holder.itemRatingView.setText(""+fourSquareResults.venue.rating);
+            }
+
+            if (fourSquareResults.photo!=null){
+                String photoUrl=fourSquareResults.photo.getFormattedPhotoUrl();
+                if(!photoUrl.isEmpty()){
+                    Picasso.with(VenueItemListActivity.this).load(photoUrl).into(holder.itemIconView);
+                }
+            }
+
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mTwoPane) {
                         Bundle arguments = new Bundle();
-                        // arguments.putString(VenueItemDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+                        arguments.putSerializable(VenueItemDetailFragment.ARG_ITEM_ID,fourSquareResults);
                         VenueItemDetailFragment fragment = new VenueItemDetailFragment();
                         fragment.setArguments(arguments);
                         getSupportFragmentManager().beginTransaction().replace(R.id.venue_item_detail_container, fragment).commit();
@@ -143,6 +190,7 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
                     }
                 }
             });
+
         }
 
         @Override
@@ -169,6 +217,12 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
 
 
         }
+
+        private void refreshItems(List<FourSquareResults> items){
+            this.mValues=items;
+            notifyDataSetChanged();
+        }
+
     }
 
     private void handleRuntimePermission(){
@@ -216,6 +270,53 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
         if(messageView!=null){
             messageView.setGravity(Gravity.CENTER);
         }
+    }
+
+    private void doSearchApiCallToFoursquare(String searchText){
+        VenueSearchApiInterface apiService= RetroApiClient.getClient().create(VenueSearchApiInterface.class);
+        Call<FoursquareRootJSON>apiInvokeCall=null;
+        String cityInputText=nearbyEditor.getText().toString();
+        if(!cityInputText.isEmpty()){
+            apiInvokeCall=apiService.searchVenueNearCity(getString(R.string.foursquare_client_id),getString(R.string.foursquare_client_secret),searchText,cityInputText);
+        }else if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED){
+            Location lastLocation=LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+            if(lastLocation!=null){
+                String ll=""+lastLocation.getLatitude()+","+lastLocation.getLongitude();
+                apiInvokeCall=apiService.searchVenueNearMe(getString(R.string.foursquare_client_id),getString(R.string.foursquare_client_secret),searchText,ll,1000);
+            }
+        }
+
+        if(apiInvokeCall==null){
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getApplicationContext(),"Location is not available.  Please provide city to perform nearby search",Toast.LENGTH_LONG).show();
+                }
+            });
+            return;
+        }
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                showProgressDialog();
+            }
+        });
+        apiInvokeCall.enqueue(new Callback<FoursquareRootJSON>() {
+            @Override
+            public void onResponse(Call<FoursquareRootJSON> call, Response<FoursquareRootJSON> response) {
+                hideProgressDialog();
+                FoursquareRootJSON foursquareRootJSON=response.body();
+                if(foursquareRootJSON!=null&&foursquareRootJSON.response!=null){
+                    simpleItemRecyclerViewAdapter.refreshItems(foursquareRootJSON.response.group.results);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FoursquareRootJSON> call, Throwable t) {
+                hideProgressDialog();
+                showMessageAlertWithOkButton("Error","There was some error in performing search");
+            }
+        });
     }
 
 }

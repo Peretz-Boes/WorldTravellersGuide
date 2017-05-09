@@ -40,7 +40,7 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/searchBarLayout">
 
-        <include layout="@layout/venue_item_list_content"/>
+        <include layout="@layout/venue_item_list"/>
     </FrameLayout>
 
 

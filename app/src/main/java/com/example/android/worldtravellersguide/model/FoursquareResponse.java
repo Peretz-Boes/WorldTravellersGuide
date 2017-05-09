@@ -7,9 +7,6 @@
 
 package com.example.android.worldtravellersguide.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class FoursquareResponse {
-    public List<FoursquareVenue> venues = new ArrayList<>();
+   public FourSquareGroup group;
 }
