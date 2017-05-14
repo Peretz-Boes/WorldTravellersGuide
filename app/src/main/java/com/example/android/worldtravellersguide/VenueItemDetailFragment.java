@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.android.worldtravellersguide.model.FourSquareResults;
+import com.example.android.worldtravellersguide.model.FoursquareLocation;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -29,6 +30,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class VenueItemDetailFragment extends Fragment implements OnMapReadyCallback,GoogleMap.OnInfoWindowClickListener {
     public static final String ARG_ITEM_ID = "item_id";
     private FourSquareResults mItem;
+    private FoursquareLocation venueLocation;
     private GoogleMap map;
 
     public VenueItemDetailFragment() {
@@ -43,7 +45,7 @@ public class VenueItemDetailFragment extends Fragment implements OnMapReadyCallb
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                appBarLayout.setTitle(mItem.venue.name);
+                appBarLayout.setTitle("Your selected venue");
             }
         }
     }

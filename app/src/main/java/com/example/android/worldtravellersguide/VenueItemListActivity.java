@@ -14,6 +14,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -183,10 +184,17 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
                         getSupportFragmentManager().beginTransaction().replace(R.id.venue_item_detail_container, fragment).commit();
                     } else {
                         Context context = v.getContext();
-                        Intent intent = new Intent(context, VenueItemDetailActivity.class);
-                        // intent.putExtra(VenueItemDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+                        Intent intent = new Intent(VenueItemListActivity.this, VenueItemDetailActivity.class);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            ImageView transitionImageView = (ImageView) findViewById(R.id.itemIconView);
+                            String iconViewTransitionName = getString(R.string.transition_tag) + String.valueOf(getItemId(holder.getAdapterPosition()));
+                            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(VenueItemListActivity.this, transitionImageView, iconViewTransitionName);
+                            ActivityCompat.startActivity(VenueItemListActivity.this, intent, options.toBundle());
+                        } else {
+                            //intent.putExtra(VenueItemDetailFragment.ARG_ITEM_ID, holder.mItem.id);
 
-                        context.startActivity(intent);
+                            context.startActivity(intent);
+                        }
                     }
                 }
             });

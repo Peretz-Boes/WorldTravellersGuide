@@ -16,4 +16,18 @@
     <string name="foursquare_client_id" templateMergeStrategy="preserve" translatable="false">LE1LKPJZWSPNQVVEQEYI0A24DEH54KZVVIT1WI1CB3GOUJVT</string>
     <string name="foursquare_client_secret" templateMergeStrategy="preserve" translatable="false">WCFHNL3KMOBJH5QRREUQZ3FFAQLV10KRUJ445LCBROYESFPN</string>
     <string name="google_maps_key">AIzaSyBwYPf5m2CcuC7hWRDrSeRgGZHtU8ugxiI</string>
+    <string name="search_query_edit_text_prompt">Enter search term</string>
+    <string name="search_query_edit_text_content_description">Enter search query</string>
+    <string name="location_edit_text_prompt">Near me</string>
+    <string name="location_edit_text_content_description">Enter your location to perform a nearby search</string>
+    <string name="item_icon_view_content_description">Venue Icon</string>
+    <string name="item_name_view_text">Item Name</string>
+    <string name="item_name_view_content_description">Venue Name</string>
+    <string name="item_address_view_text">Address</string>
+    <string name="item_address_view_content_description">Venue Address</string>
+    <string name="item_rating_view_text">8.0</string>
+    <string name="item_rating_view_content_description">Venue Rating</string>
+    <string name="transition_tag" translatable="false">transition</string>
+    <string name="venue_widget_icon_content_description">Venue widget icon</string>
+    <string name="venue_widget_content_description">Results of a search for a random venue</string>
 </resources>

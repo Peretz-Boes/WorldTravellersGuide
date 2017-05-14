@@ -4,6 +4,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
+                android:background="@drawable/world_travellers_guide_background_image"
                 tools:context="com.example.android.worldtravellersguide.VenueItemListActivity">
 
     <RelativeLayout
@@ -18,8 +19,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/white"
-            android:hint="Enter search term"
-            android:padding="3dp"/>
+            android:text="@string/search_query_edit_text_prompt"
+            android:padding="3dp"
+            android:contentDescription="@string/search_query_edit_text_content_description"/>
 
         <EditText
             android:id="@+id/nearbyEditor"
@@ -28,8 +30,9 @@
             android:layout_below="@+id/searchInputEditor"
             android:layout_marginTop="3dp"
             android:background="@android:color/white"
-            android:hint="Near me"
-            android:padding="3dp"/>
+            android:text="@string/location_edit_text_prompt"
+            android:padding="3dp"
+            android:contentDescription="@string/location_edit_text_content_description"/>
 
 
     </RelativeLayout>

@@ -6,4 +6,10 @@
     <dimen name="app_bar_height">200dp</dimen>
     <dimen name="item_width">200dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="widget_height">110dp</dimen>
+    <dimen name="widget_width">250dp</dimen>
+    <dimen name="widget_title_padding">8dp</dimen>
+    <dimen name="widget_icon_size">32dp</dimen>
+    <dimen name="widget_padding">5dp</dimen>
+    <dimen name="venue_widget_margin">8dp</dimen>
 </resources>
