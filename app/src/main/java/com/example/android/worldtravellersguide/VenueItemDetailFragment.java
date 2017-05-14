@@ -45,7 +45,7 @@ public class VenueItemDetailFragment extends Fragment implements OnMapReadyCallb
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                appBarLayout.setTitle("Your selected venue");
+                appBarLayout.setTitle(mItem.venue.name);
             }
         }
     }
