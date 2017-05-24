@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
@@ -18,7 +19,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.android.worldtravellersguide.model.FourSquareResults;
-import com.example.android.worldtravellersguide.model.FoursquareLocation;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -30,7 +30,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class VenueItemDetailFragment extends Fragment implements OnMapReadyCallback,GoogleMap.OnInfoWindowClickListener {
     public static final String ARG_ITEM_ID = "item_id";
     private FourSquareResults mItem;
-    private FoursquareLocation venueLocation;
     private GoogleMap map;
 
     public VenueItemDetailFragment() {
@@ -63,7 +62,13 @@ public class VenueItemDetailFragment extends Fragment implements OnMapReadyCallb
         LatLng venueLatLng=new LatLng(mItem.venue.location.lat,mItem.venue.location.lng);
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(venueLatLng,16));
         Marker marker=map.addMarker(new MarkerOptions().position(venueLatLng).title(mItem.venue.name).snippet("View on Foursquare"));
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED){
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED){
+                map.setMyLocationEnabled(true);
+            }else {
+                Toast.makeText(getContext(),"You need to enable location for this feature to work",Toast.LENGTH_LONG).show();
+            }
+        } else {
             map.setMyLocationEnabled(true);
         }
         marker.showInfoWindow();
@@ -74,7 +79,7 @@ public class VenueItemDetailFragment extends Fragment implements OnMapReadyCallb
         FragmentManager manager=getFragmentManager();
         FragmentTransaction transaction=manager.beginTransaction();
         SupportMapFragment fragment=new SupportMapFragment();
-        transaction.add(R.id.map_frame_layout,fragment);
+        transaction.add(R.id.venue_map_view,fragment);
         transaction.commit();
         fragment.getMapAsync(this);
     }

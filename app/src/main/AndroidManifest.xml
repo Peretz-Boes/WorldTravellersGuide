@@ -24,14 +24,30 @@
             </intent-filter>
         </activity>
 
+        <receiver android:name="com.example.android.worldtravellersguide.widget.VenueWidgetProvider"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.AppWidgetProvider"
+                android:resource="@xml/venues_near_location_info"/>
+        </receiver>
+
         <activity android:name=".VenueItemDetailActivity"
                   android:screenOrientation="portrait">
         </activity>
 
+        <service android:name=".widget.VenueWidgetIntentService"
+                 android:permission="android.permission.BIND_REMOTE_VIEWS"/>
+
+        <provider
+            android:authorities="com.example.android.database.VenueProvider"
+            android:name=".database.VenueProvider"/>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key"/>
-
     </application>
 
 </manifest>

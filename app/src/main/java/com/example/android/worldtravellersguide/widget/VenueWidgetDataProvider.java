@@ -8,6 +8,8 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.example.android.worldtravellersguide.R;
+import com.example.android.worldtravellersguide.model.FourSquareResults;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 /**
  * Created by Peretz on 2017-04-05.
@@ -16,6 +18,8 @@ import com.example.android.worldtravellersguide.R;
 class VenueWidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
     private Context mContext = null;
     private Cursor cursor = null;
+    private GoogleApiClient googleApiClient;
+    private FourSquareResults mItem;
 
     VenueWidgetDataProvider(Context context) {
         mContext = context;
@@ -28,19 +32,7 @@ class VenueWidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public void onDataSetChanged() {
-//        if (cursor != null) {
-//            cursor.close();
-//        }
-//        // This method is called by the app hosting the widget (e.g., the launcher)
-//        // However, our ContentProvider is not exported so it doesn't have access to the
-//        // data. Therefore we need to clear (and finally restore) the calling identity so
-//        // that calls use our process and permission
-//        final long identityToken = Binder.clearCallingIdentity();
-//        cursor = mContext.getContentResolver().query(
-//                Contract.Quote.URI,
-//                Contract.Quote.QUOTE_COLUMNS,
-//                null, null, Contract.Quote.COLUMN_SYMBOL);
-//        Binder.restoreCallingIdentity(identityToken);
+
     }
 
     @Override
@@ -64,12 +56,8 @@ class VenueWidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
 
         RemoteViews view = new RemoteViews(mContext.getPackageName(), R.layout.venue_item_list);
 
-        String  symbol = null;
-//        if (this.cursor.moveToPosition(i)) {
-//            symbol = cursor.getString(Contract.Quote.POSITION_SYMBOL);
-//            Float price = cursor.getFloat(Contract.Quote.POSITION_PRICE);
-//            Float change = cursor.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
-//
+        String name=mItem.venue.name;
+        double rating=mItem.venue.rating;
 //            view.setTextViewText(R.id.symbol, symbol);
 //            view.setTextViewText(R.id.price, Formatter.getDollarFormat(price));
 //            view.setTextViewText(R.id.change, Formatter.getDollarFormatWithPlus(change));
@@ -78,7 +66,6 @@ class VenueWidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
 //            } else {
 //                view.setInt(R.id.change, "setBackgroundResource", R.drawable.percent_change_pill_red);
 //            }
-//        }
 
         final Intent fillInIntent = new Intent();
 //        fillInIntent.putExtra(HistoryActivity.EXTRA_SYMBOL, symbol);
@@ -98,7 +85,7 @@ class VenueWidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public long getItemId(int i) {
-        if (cursor.moveToPosition(i)){
+        if (cursor.moveToPosition(i)) {
             //return cursor.getInt(Contract.Quote.POSITION_ID);
         }
         return i;
@@ -108,4 +95,5 @@ class VenueWidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
     public boolean hasStableIds() {
         return true;
     }
+
 }

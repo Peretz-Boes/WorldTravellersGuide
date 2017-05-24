@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,7 @@ import com.example.android.worldtravellersguide.model.FourSquareResults;
 import com.example.android.worldtravellersguide.model.FoursquareRootJSON;
 import com.example.android.worldtravellersguide.network.RetroApiClient;
 import com.example.android.worldtravellersguide.network.VenueSearchApiInterface;
+import com.example.android.worldtravellersguide.tasks.InsertWidgetDataAsyncTask;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -41,6 +43,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -54,6 +57,7 @@ import static android.os.Build.VERSION.SDK_INT;
 public class VenueItemListActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener{
 
     private static final int PERMISSION_ACCESS_FINE_LOCATION=1;
+    public static final String LOG_TAG=VenueItemListActivity.class.getSimpleName();
     private boolean mTwoPane;
     private GoogleApiClient googleApiClient;
     private boolean isConnected=false;
@@ -85,6 +89,10 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
         }
 
         googleApiClient=new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
+
+        String randomQueries[]={"hotels","auto garages","hospitals","medical offices","restaurants"};
+        Random random=new Random();
+        doSearchApiCallToFoursquareWithRandomQuery(randomQueries[random.nextInt(randomQueries.length-1)]);
 
     }
 
@@ -185,11 +193,13 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
                     } else {
                         Context context = v.getContext();
                         Intent intent = new Intent(VenueItemListActivity.this, VenueItemDetailActivity.class);
+                        intent.putExtra(VenueItemDetailFragment.ARG_ITEM_ID,fourSquareResults);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             ImageView transitionImageView = (ImageView) findViewById(R.id.itemIconView);
                             String iconViewTransitionName = getString(R.string.transition_tag) + String.valueOf(getItemId(holder.getAdapterPosition()));
                             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(VenueItemListActivity.this, transitionImageView, iconViewTransitionName);
                             ActivityCompat.startActivity(VenueItemListActivity.this, intent, options.toBundle());
+                            Log.d(LOG_TAG,"Transition complete");
                         } else {
                             //intent.putExtra(VenueItemDetailFragment.ARG_ITEM_ID, holder.mItem.id);
 
@@ -325,6 +335,38 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
                 showMessageAlertWithOkButton("Error","There was some error in performing search");
             }
         });
+    }
+
+    private void doSearchApiCallToFoursquareWithRandomQuery(String query){
+        VenueSearchApiInterface apiService= RetroApiClient.getClient().create(VenueSearchApiInterface.class);
+        Call<FoursquareRootJSON> apiInvokeCall=null;
+        try {
+            Location lastLocation= LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+            if (lastLocation!=null){
+                String ll=lastLocation.getLatitude()+","+lastLocation.getLongitude();
+                apiInvokeCall=apiService.searchRandomVenueNearMe(String.valueOf(R.string.foursquare_client_id),String.valueOf(R.string.foursquare_client_secret),query,ll,1000);
+                if (apiInvokeCall==null){
+                    Log.d(LOG_TAG,"Unable to access location");
+                    return;
+                }
+                apiInvokeCall.enqueue(new Callback<FoursquareRootJSON>() {
+                    @Override
+                    public void onResponse(Call<FoursquareRootJSON> call, Response<FoursquareRootJSON> response) {
+                        FoursquareRootJSON foursquareRootJSON=response.body();
+                        InsertWidgetDataAsyncTask insertWidgetDataAsyncTask=new InsertWidgetDataAsyncTask();
+                        insertWidgetDataAsyncTask.execute();
+                        Log.d(LOG_TAG,"Widget data inserted into database");
+                    }
+
+                    @Override
+                    public void onFailure(Call<FoursquareRootJSON> call, Throwable t) {
+                        Log.d(LOG_TAG,"Error getting data");
+                    }
+                });
+            }
+        }catch (SecurityException e){
+            Toast.makeText(getApplicationContext(),"You need to enable location for this feature to work",Toast.LENGTH_LONG).show();
+        }
     }
 
 }

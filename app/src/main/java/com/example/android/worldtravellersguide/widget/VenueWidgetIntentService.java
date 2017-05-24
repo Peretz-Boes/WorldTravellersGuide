@@ -10,7 +10,7 @@ public class VenueWidgetIntentService extends RemoteViewsService {
 
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        return new StockWidgetDataProvider(this);
+        return new VenueWidgetDataProvider(this);
     }
 
 }
