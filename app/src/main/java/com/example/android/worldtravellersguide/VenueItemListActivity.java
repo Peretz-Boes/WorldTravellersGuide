@@ -92,7 +92,7 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
 
         String randomQueries[]={"hotels","auto garages","hospitals","medical offices","restaurants"};
         Random random=new Random();
-        doSearchApiCallToFoursquareWithRandomQuery(randomQueries[random.nextInt(randomQueries.length-1)]);
+        //doSearchApiCallToFoursquareWithRandomQuery(randomQueries[random.nextInt(randomQueries.length-1)]);
 
     }
 
@@ -179,6 +179,12 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
                 if(!photoUrl.isEmpty()){
                     Picasso.with(VenueItemListActivity.this).load(photoUrl).into(holder.itemIconView);
                 }
+            }
+
+            if (fourSquareResults.venue!=null&&fourSquareResults.photo!=null){
+                InsertWidgetDataAsyncTask insertWidgetDataAsyncTask=new InsertWidgetDataAsyncTask(getApplicationContext(),fourSquareResults);
+                insertWidgetDataAsyncTask.execute();
+                Log.d(LOG_TAG,"Result data inserted into database");
             }
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -353,9 +359,10 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
                     @Override
                     public void onResponse(Call<FoursquareRootJSON> call, Response<FoursquareRootJSON> response) {
                         FoursquareRootJSON foursquareRootJSON=response.body();
-                        InsertWidgetDataAsyncTask insertWidgetDataAsyncTask=new InsertWidgetDataAsyncTask();
-                        insertWidgetDataAsyncTask.execute();
-                        Log.d(LOG_TAG,"Widget data inserted into database");
+                        if(foursquareRootJSON!=null&&foursquareRootJSON.response!=null){
+
+                        }
+
                     }
 
                     @Override

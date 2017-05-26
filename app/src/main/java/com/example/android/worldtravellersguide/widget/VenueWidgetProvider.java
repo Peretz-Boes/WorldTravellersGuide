@@ -18,8 +18,6 @@ import com.example.android.worldtravellersguide.VenueItemListActivity;
  */
 public class VenueWidgetProvider extends AppWidgetProvider {
 
-    private Context mContext=null;
-
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
