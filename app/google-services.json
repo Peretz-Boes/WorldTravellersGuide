@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "867933474232",
+    "firebase_url": "https://worldtravellersguide-169018.firebaseio.com",
+    "project_id": "worldtravellersguide-169018",
+    "storage_bucket": "worldtravellersguide-169018.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:867933474232:android:2e173918ec79b027",
+        "android_client_info": {
+          "package_name": "com.example.android.worldtravellersguide"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "867933474232-q1t5pq52dphnpicmjmf7ip8trcultu3p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvxMW6nwSGjai8ZrehtN7D0CZFCKN3pnw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
