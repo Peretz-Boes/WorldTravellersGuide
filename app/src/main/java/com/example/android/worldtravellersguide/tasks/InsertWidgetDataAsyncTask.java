@@ -8,6 +8,8 @@ import com.example.android.worldtravellersguide.database.DatabaseUtils;
 import com.example.android.worldtravellersguide.database.VenueContract;
 import com.example.android.worldtravellersguide.model.FourSquareResults;
 
+import java.util.List;
+
 /**
  * Created by Peretz on 2017-05-23.
  */
@@ -15,17 +17,20 @@ import com.example.android.worldtravellersguide.model.FourSquareResults;
 public class InsertWidgetDataAsyncTask extends AsyncTask<Void,Void,Void> {
 
     Context context;
-    private FourSquareResults fourSquareResults;
+    private List<FourSquareResults>fourSquareResultsList;
 
-    public InsertWidgetDataAsyncTask(Context context, FourSquareResults fourSquareResults) {
+    public InsertWidgetDataAsyncTask(Context context, List<FourSquareResults> fourSquareResults) {
         this.context = context;
-        this.fourSquareResults = fourSquareResults;
+        this.fourSquareResultsList=fourSquareResults;
     }
 
     @Override
     protected Void doInBackground(Void... params) {
-        ContentValues contentValues= DatabaseUtils.toContentValues(fourSquareResults);
-        context.getContentResolver().insert(VenueContract.VenueEntry.CONTENT_URI,contentValues);
+        context.getContentResolver().delete(VenueContract.VenueEntry.CONTENT_URI,null,null);
+        for (FourSquareResults fourSquareResult:fourSquareResultsList) {
+            ContentValues contentValues = DatabaseUtils.toContentValues(fourSquareResult);
+            context.getContentResolver().insert(VenueContract.VenueEntry.CONTENT_URI, contentValues);
+        }
         return null;
     }
 }

@@ -8,9 +8,12 @@ import android.widget.RemoteViewsService;
  */
 public class VenueWidgetIntentService extends RemoteViewsService {
 
+    public static final String KEY_WIDGET_ID="KEY_WIDGET_ID";
+
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        return new VenueWidgetDataProvider(this);
+        int appWidgetId=intent.getIntExtra(KEY_WIDGET_ID,0);
+        return new VenueWidgetDataProvider(this,appWidgetId);
     }
 
 }

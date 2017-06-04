@@ -176,15 +176,14 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
 
             if (fourSquareResults.photo!=null){
                 String photoUrl=fourSquareResults.photo.getFormattedPhotoUrl();
+                Log.d(LOG_TAG,"Photo url "+photoUrl);
                 if(!photoUrl.isEmpty()){
                     Picasso.with(VenueItemListActivity.this).load(photoUrl).into(holder.itemIconView);
                 }
             }
 
             if (fourSquareResults.venue!=null&&fourSquareResults.photo!=null){
-                InsertWidgetDataAsyncTask insertWidgetDataAsyncTask=new InsertWidgetDataAsyncTask(getApplicationContext(),fourSquareResults);
-                insertWidgetDataAsyncTask.execute();
-                Log.d(LOG_TAG,"Result data inserted into database");
+
             }
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -245,6 +244,9 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
         private void refreshItems(List<FourSquareResults> items){
             this.mValues=items;
             notifyDataSetChanged();
+            InsertWidgetDataAsyncTask insertWidgetDataAsyncTask=new InsertWidgetDataAsyncTask(getApplicationContext(),items);
+            insertWidgetDataAsyncTask.execute();
+            Log.d(LOG_TAG,"Result data inserted into database");
         }
 
     }

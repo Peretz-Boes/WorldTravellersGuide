@@ -19,7 +19,14 @@ public class VenueDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        final String CREATE_VENUE_TABLE="CREATE TABLE "+ VenueContract.VenueEntry.TABLE_NAME+" ("+VenueContract.VenueEntry._ID+" TEXT NOT NULL,"+VenueContract.VenueEntry.NAME_COLUMN+" TEXT NOT NULL,"+VenueContract.VenueEntry.IMAGE_COLUMN+" TEXT NOT NULL,"+VenueContract.VenueEntry.RATING_COLUMN+" REAL TEXT NOT NULL"+")";
+        final String CREATE_VENUE_TABLE = "CREATE TABLE " + VenueContract.VenueEntry.TABLE_NAME + " (" +
+                VenueContract.VenueEntry._ID + " TEXT NOT NULL," +
+                VenueContract.VenueEntry.NAME_COLUMN + " TEXT NOT NULL," +
+                VenueContract.VenueEntry.IMAGE_COLUMN + " TEXT," +
+                VenueContract.VenueEntry.RATING_COLUMN + " REAL NOT NULL," +
+                VenueContract.VenueEntry.LATITUDE_COLUMN + " REAL NOT NULL," +
+                VenueContract.VenueEntry.LONGITUDE_COLUMN + " REAL NOT NULL," +
+                VenueContract.VenueEntry.ADDRESS_COLUMN + " TEXT NOT NULL" + ")";
         sqLiteDatabase.execSQL(CREATE_VENUE_TABLE);
     }
 

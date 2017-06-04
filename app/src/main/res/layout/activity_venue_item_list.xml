@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/white"
-            android:text="@string/search_query_edit_text_prompt"
+            android:hint="@string/search_query_edit_text_prompt"
             android:padding="3dp"
             android:contentDescription="@string/search_query_edit_text_content_description"/>
 
@@ -30,7 +30,7 @@
             android:layout_below="@+id/searchInputEditor"
             android:layout_marginTop="3dp"
             android:background="@android:color/white"
-            android:text="@string/location_edit_text_prompt"
+            android:hint="@string/location_edit_text_prompt"
             android:padding="3dp"
             android:contentDescription="@string/location_edit_text_content_description"/>
 

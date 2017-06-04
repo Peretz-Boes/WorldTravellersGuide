@@ -27,11 +27,17 @@ public class VenueContract {
         public static final String NAME_COLUMN="name";
         public static final String IMAGE_COLUMN="image";
         public static final String RATING_COLUMN="rating";
+        public static final String LATITUDE_COLUMN="latitude";
+        public static final String LONGITUDE_COLUMN="longitude";
+        public static final String ADDRESS_COLUMN="address";
         public static final int POSITION_ID=0;
         public static final int POSITION_NAME=1;
         public static final int POSITION_IMAGE=2;
         public static final int POSITION_RATING=3;
-        public static final String[] VENUE_COLUMNS={_ID,NAME_COLUMN,IMAGE_COLUMN,RATING_COLUMN};
+        public static final int POSITION_LATITUDE=4;
+        public static final int POSITION_LONGITUDE=5;
+        public static final int POSITION_ADDRESS=6;
+        public static final String[] VENUE_COLUMNS={_ID,NAME_COLUMN,IMAGE_COLUMN,RATING_COLUMN,LATITUDE_COLUMN,LONGITUDE_COLUMN};
 
         public static String getVenueIdFromUri(Uri uri){
             return uri.getPathSegments().get(1);

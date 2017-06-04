@@ -39,7 +39,7 @@
         </activity>
 
         <service android:name=".widget.VenueWidgetIntentService"
-                 android:permission="android.permission.BIND_REMOTE_VIEWS"/>
+                 android:permission="android.permission.BIND_REMOTEVIEWS"/>
 
         <provider
             android:authorities="com.example.android.worldtravellersguide.database.VenueProvider"

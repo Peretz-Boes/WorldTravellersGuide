@@ -122,7 +122,7 @@ public class VenueProvider extends ContentProvider {
                 }
                 break;
             default:
-                throw new UnsupportedOperationException("Unkown uri "+uri);
+                throw new UnsupportedOperationException("Unknown uri "+uri);
         }
         sqLiteDatabase.close();
         return returnUri;
