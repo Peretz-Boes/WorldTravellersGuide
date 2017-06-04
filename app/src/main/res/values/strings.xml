@@ -31,4 +31,5 @@
     <string name="transition_tag" translatable="false">transition</string>
     <string name="venue_widget_icon_content_description">Venue widget icon</string>
     <string name="venue_widget_content_description">Results of a search for a random venue</string>
+    <string name="no_data_found_error_message">No data found</string>
 </resources>
