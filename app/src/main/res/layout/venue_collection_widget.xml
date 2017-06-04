@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:id="@+id/widget_layout_main"
-             android:orientation="vertical"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:padding="@dimen/venue_widget_margin">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/widget_layout_main"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#80000000"
+              android:orientation="vertical"
+              android:padding="@dimen/venue_widget_margin">
 
-    <LinearLayout
+
+    <ListView
+        android:id="@+id/widget_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:fadeScrollbars="false"
+        android:scrollbars="vertical"
+        />
 
-        <ListView
-            android:id="@+id/widget_list"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/venue_widget_content_description"/>
+    <TextView
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="No data found"
+        android:textColor="@android:color/white"
+        android:textSize="22sp"
+        android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/error_message_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="An error has occured getting the data"/>
 
-    </LinearLayout>
-</FrameLayout>
+</LinearLayout>
+

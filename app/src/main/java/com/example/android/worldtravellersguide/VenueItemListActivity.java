@@ -54,13 +54,13 @@ import retrofit2.Response;
 import static android.os.Build.VERSION.SDK_INT;
 
 
-public class VenueItemListActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener{
+public class VenueItemListActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    private static final int PERMISSION_ACCESS_FINE_LOCATION=1;
-    public static final String LOG_TAG=VenueItemListActivity.class.getSimpleName();
+    private static final int PERMISSION_ACCESS_FINE_LOCATION = 1;
+    public static final String LOG_TAG = VenueItemListActivity.class.getSimpleName();
     private boolean mTwoPane;
     private GoogleApiClient googleApiClient;
-    private boolean isConnected=false;
+    private boolean isConnected = false;
     private ProgressDialog progressDialog;
     private Timer searchDelayTimer;
     private EditText searchTextEditor;
@@ -80,18 +80,18 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
             mTwoPane = true;
         }
 
-        searchTextEditor=(EditText)findViewById(R.id.searchInputEditor);
-        nearbyEditor=(EditText)findViewById(R.id.nearbyEditor);
+        searchTextEditor = (EditText) findViewById(R.id.searchInputEditor);
+        nearbyEditor = (EditText) findViewById(R.id.nearbyEditor);
         searchTextEditor.addTextChangedListener(new SearchTextWatcher());
 
-        if(SDK_INT>=Build.VERSION_CODES.M){
+        if (SDK_INT >= Build.VERSION_CODES.M) {
             handleRuntimePermission();
         }
 
-        googleApiClient=new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
+        googleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
 
-        String randomQueries[]={"hotels","auto garages","hospitals","medical offices","restaurants"};
-        Random random=new Random();
+        String randomQueries[] = {"hotels", "auto garages", "hospitals", "medical offices", "restaurants"};
+        Random random = new Random();
         //doSearchApiCallToFoursquareWithRandomQuery(randomQueries[random.nextInt(randomQueries.length-1)]);
 
     }
@@ -109,36 +109,36 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        simpleItemRecyclerViewAdapter=new SimpleItemRecyclerViewAdapter(new ArrayList<FourSquareResults>());
+        simpleItemRecyclerViewAdapter = new SimpleItemRecyclerViewAdapter(new ArrayList<FourSquareResults>());
         recyclerView.setAdapter(simpleItemRecyclerViewAdapter);
     }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        isConnected=true;
+        isConnected = true;
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        isConnected=false;
+        isConnected = false;
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        isConnected=false;
+        isConnected = false;
     }
 
-    private class SearchTextWatcher implements TextWatcher{
+    private class SearchTextWatcher implements TextWatcher {
         @Override
         public void afterTextChanged(Editable editable) {
-            final String inputText=editable.toString();
-            searchDelayTimer=new Timer();
+            final String inputText = editable.toString();
+            searchDelayTimer = new Timer();
             searchDelayTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     doSearchApiCallToFoursquare(inputText);
                 }
-            },500);
+            }, 500);
         }
 
         @Override
@@ -167,23 +167,18 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            final FourSquareResults fourSquareResults=mValues.get(position);
-            if (fourSquareResults.venue!=null){
+            final FourSquareResults fourSquareResults = mValues.get(position);
+            if (fourSquareResults.venue != null) {
                 holder.itemNameView.setText(fourSquareResults.venue.name);
                 holder.itemAddressView.setText(fourSquareResults.venue.location.address);
-                holder.itemRatingView.setText(""+fourSquareResults.venue.rating);
+                holder.itemRatingView.setText("" + fourSquareResults.venue.rating);
             }
 
-            if (fourSquareResults.photo!=null){
-                String photoUrl=fourSquareResults.photo.getFormattedPhotoUrl();
-                Log.d(LOG_TAG,"Photo url "+photoUrl);
-                if(!photoUrl.isEmpty()){
+            if (fourSquareResults.photo != null) {
+                String photoUrl = fourSquareResults.photo.getFormattedPhotoUrl();
+                if (!photoUrl.isEmpty()) {
                     Picasso.with(VenueItemListActivity.this).load(photoUrl).into(holder.itemIconView);
                 }
-            }
-
-            if (fourSquareResults.venue!=null&&fourSquareResults.photo!=null){
-
             }
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -191,20 +186,20 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
                 public void onClick(View v) {
                     if (mTwoPane) {
                         Bundle arguments = new Bundle();
-                        arguments.putSerializable(VenueItemDetailFragment.ARG_ITEM_ID,fourSquareResults);
+                        arguments.putSerializable(VenueItemDetailFragment.ARG_ITEM_ID, fourSquareResults);
                         VenueItemDetailFragment fragment = new VenueItemDetailFragment();
                         fragment.setArguments(arguments);
                         getSupportFragmentManager().beginTransaction().replace(R.id.venue_item_detail_container, fragment).commit();
                     } else {
                         Context context = v.getContext();
                         Intent intent = new Intent(VenueItemListActivity.this, VenueItemDetailActivity.class);
-                        intent.putExtra(VenueItemDetailFragment.ARG_ITEM_ID,fourSquareResults);
+                        intent.putExtra(VenueItemDetailFragment.ARG_ITEM_ID, fourSquareResults);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             ImageView transitionImageView = (ImageView) findViewById(R.id.itemIconView);
                             String iconViewTransitionName = getString(R.string.transition_tag) + String.valueOf(getItemId(holder.getAdapterPosition()));
                             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(VenueItemListActivity.this, transitionImageView, iconViewTransitionName);
                             ActivityCompat.startActivity(VenueItemListActivity.this, intent, options.toBundle());
-                            Log.d(LOG_TAG,"Transition complete");
+                            Log.d(LOG_TAG, "Transition complete");
                         } else {
                             //intent.putExtra(VenueItemDetailFragment.ARG_ITEM_ID, holder.mItem.id);
 
@@ -241,32 +236,32 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
 
         }
 
-        private void refreshItems(List<FourSquareResults> items){
-            this.mValues=items;
+        private void refreshItems(List<FourSquareResults> items) {
+            this.mValues = items;
             notifyDataSetChanged();
-            InsertWidgetDataAsyncTask insertWidgetDataAsyncTask=new InsertWidgetDataAsyncTask(getApplicationContext(),items);
+            InsertWidgetDataAsyncTask insertWidgetDataAsyncTask = new InsertWidgetDataAsyncTask(getApplicationContext(), items);
             insertWidgetDataAsyncTask.execute();
-            Log.d(LOG_TAG,"Result data inserted into database");
+            Log.d(LOG_TAG, "Result data inserted into database");
         }
 
     }
 
-    private void handleRuntimePermission(){
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},PERMISSION_ACCESS_FINE_LOCATION);
+    private void handleRuntimePermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_ACCESS_FINE_LOCATION);
         }
     }
 
-    private void cancelTimer(){
-        if(searchDelayTimer!=null){
+    private void cancelTimer() {
+        if (searchDelayTimer != null) {
             searchDelayTimer.cancel();
-            searchDelayTimer=null;
+            searchDelayTimer = null;
         }
     }
 
-    private void showProgressDialog(){
-        if(progressDialog==null){
-            progressDialog=new ProgressDialog(this);
+    private void showProgressDialog() {
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(this);
             progressDialog.setMessage("Searching");
             progressDialog.setCancelable(false);
             progressDialog.setCanceledOnTouchOutside(false);
@@ -274,15 +269,15 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
         }
     }
 
-    private void hideProgressDialog(){
-        if(progressDialog!=null&&progressDialog.isShowing()){
+    private void hideProgressDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
-            progressDialog=null;
+            progressDialog = null;
         }
     }
 
-    private void showMessageAlertWithOkButton(String title,String message){
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+    private void showMessageAlertWithOkButton(String title, String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(message);
         builder.setCancelable(false);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -291,32 +286,32 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
                 dialog.dismiss();
             }
         });
-        AlertDialog dialog=builder.show();
-        TextView messageView=(TextView)dialog.findViewById(android.R.id.message);
-        if(messageView!=null){
+        AlertDialog dialog = builder.show();
+        TextView messageView = (TextView) dialog.findViewById(android.R.id.message);
+        if (messageView != null) {
             messageView.setGravity(Gravity.CENTER);
         }
     }
 
-    private void doSearchApiCallToFoursquare(String searchText){
-        VenueSearchApiInterface apiService= RetroApiClient.getClient().create(VenueSearchApiInterface.class);
-        Call<FoursquareRootJSON>apiInvokeCall=null;
-        String cityInputText=nearbyEditor.getText().toString();
-        if(!cityInputText.isEmpty()){
-            apiInvokeCall=apiService.searchVenueNearCity(getString(R.string.foursquare_client_id),getString(R.string.foursquare_client_secret),searchText,cityInputText);
-        }else if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED){
-            Location lastLocation=LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-            if(lastLocation!=null){
-                String ll=""+lastLocation.getLatitude()+","+lastLocation.getLongitude();
-                apiInvokeCall=apiService.searchVenueNearMe(getString(R.string.foursquare_client_id),getString(R.string.foursquare_client_secret),searchText,ll,1000);
+    private void doSearchApiCallToFoursquare(String searchText) {
+        VenueSearchApiInterface apiService = RetroApiClient.getClient().create(VenueSearchApiInterface.class);
+        Call<FoursquareRootJSON> apiInvokeCall = null;
+        String cityInputText = nearbyEditor.getText().toString();
+        if (!cityInputText.isEmpty()) {
+            apiInvokeCall = apiService.searchVenueNearCity(getString(R.string.foursquare_client_id), getString(R.string.foursquare_client_secret), searchText, cityInputText);
+        } else if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+            if (lastLocation != null) {
+                String ll = "" + lastLocation.getLatitude() + "," + lastLocation.getLongitude();
+                apiInvokeCall = apiService.searchVenueNearMe(getString(R.string.foursquare_client_id), getString(R.string.foursquare_client_secret), searchText, ll, 1000);
             }
         }
 
-        if(apiInvokeCall==null){
+        if (apiInvokeCall == null) {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getApplicationContext(),"Location is not available.  Please provide city to perform nearby search",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Location is not available.  Please provide city to perform nearby search", Toast.LENGTH_LONG).show();
                 }
             });
             return;
@@ -331,8 +326,8 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
             @Override
             public void onResponse(Call<FoursquareRootJSON> call, Response<FoursquareRootJSON> response) {
                 hideProgressDialog();
-                FoursquareRootJSON foursquareRootJSON=response.body();
-                if(foursquareRootJSON!=null&&foursquareRootJSON.response!=null){
+                FoursquareRootJSON foursquareRootJSON = response.body();
+                if (foursquareRootJSON != null && foursquareRootJSON.response != null) {
                     simpleItemRecyclerViewAdapter.refreshItems(foursquareRootJSON.response.group.results);
                 }
             }
@@ -340,28 +335,28 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
             @Override
             public void onFailure(Call<FoursquareRootJSON> call, Throwable t) {
                 hideProgressDialog();
-                showMessageAlertWithOkButton("Error","There was some error in performing search");
+                showMessageAlertWithOkButton("Error", "There was some error in performing search");
             }
         });
     }
 
-    private void doSearchApiCallToFoursquareWithRandomQuery(String query){
-        VenueSearchApiInterface apiService= RetroApiClient.getClient().create(VenueSearchApiInterface.class);
-        Call<FoursquareRootJSON> apiInvokeCall=null;
+    private void doSearchApiCallToFoursquareWithRandomQuery(String query) {
+        VenueSearchApiInterface apiService = RetroApiClient.getClient().create(VenueSearchApiInterface.class);
+        Call<FoursquareRootJSON> apiInvokeCall = null;
         try {
-            Location lastLocation= LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-            if (lastLocation!=null){
-                String ll=lastLocation.getLatitude()+","+lastLocation.getLongitude();
-                apiInvokeCall=apiService.searchRandomVenueNearMe(String.valueOf(R.string.foursquare_client_id),String.valueOf(R.string.foursquare_client_secret),query,ll,1000);
-                if (apiInvokeCall==null){
-                    Log.d(LOG_TAG,"Unable to access location");
+            Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+            if (lastLocation != null) {
+                String ll = lastLocation.getLatitude() + "," + lastLocation.getLongitude();
+                apiInvokeCall = apiService.searchRandomVenueNearMe(String.valueOf(R.string.foursquare_client_id), String.valueOf(R.string.foursquare_client_secret), query, ll, 1000);
+                if (apiInvokeCall == null) {
+                    Log.d(LOG_TAG, "Unable to access location");
                     return;
                 }
                 apiInvokeCall.enqueue(new Callback<FoursquareRootJSON>() {
                     @Override
                     public void onResponse(Call<FoursquareRootJSON> call, Response<FoursquareRootJSON> response) {
-                        FoursquareRootJSON foursquareRootJSON=response.body();
-                        if(foursquareRootJSON!=null&&foursquareRootJSON.response!=null){
+                        FoursquareRootJSON foursquareRootJSON = response.body();
+                        if (foursquareRootJSON != null && foursquareRootJSON.response != null) {
 
                         }
 
@@ -369,12 +364,12 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
 
                     @Override
                     public void onFailure(Call<FoursquareRootJSON> call, Throwable t) {
-                        Log.d(LOG_TAG,"Error getting data");
+                        Log.d(LOG_TAG, "Error getting data");
                     }
                 });
             }
-        }catch (SecurityException e){
-            Toast.makeText(getApplicationContext(),"You need to enable location for this feature to work",Toast.LENGTH_LONG).show();
+        } catch (SecurityException e) {
+            Toast.makeText(getApplicationContext(), "You need to enable location for this feature to work", Toast.LENGTH_LONG).show();
         }
     }
 

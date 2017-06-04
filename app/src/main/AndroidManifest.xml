@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.example.android.worldtravellersguide"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.example.android.worldtravellersguide">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -24,8 +24,20 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="com.example.android.worldtravellersguide.widget.VenueWidgetProvider"
-                  android:label="@string/app_name">
+
+
+        <activity
+            android:name=".VenueItemDetailActivity"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <service
+            android:name=".widget.VenueWidgetIntentService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
+
+        <receiver
+            android:name=".widget.VenueWidgetProvider"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
@@ -34,16 +46,9 @@
                 android:resource="@xml/venues_near_location_info"/>
         </receiver>
 
-        <activity android:name=".VenueItemDetailActivity"
-                  android:screenOrientation="portrait">
-        </activity>
-
-        <service android:name=".widget.VenueWidgetIntentService"
-                 android:permission="android.permission.BIND_REMOTEVIEWS"/>
-
         <provider
-            android:authorities="com.example.android.worldtravellersguide.database.VenueProvider"
             android:name=".database.VenueProvider"
+            android:authorities="com.example.android.worldtravellersguide.database.VenueProvider"
             android:exported="false"/>
 
         <meta-data

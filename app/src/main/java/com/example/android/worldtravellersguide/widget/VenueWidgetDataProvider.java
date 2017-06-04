@@ -14,6 +14,7 @@ import android.widget.RemoteViewsService;
 import com.example.android.worldtravellersguide.R;
 import com.example.android.worldtravellersguide.VenueItemDetailFragment;
 import com.example.android.worldtravellersguide.database.VenueContract;
+import com.example.android.worldtravellersguide.database.VenueContract.VenueEntry;
 import com.example.android.worldtravellersguide.model.FourSquareResults;
 import com.example.android.worldtravellersguide.model.FoursquareLocation;
 import com.example.android.worldtravellersguide.model.FoursquareVenue;
@@ -26,14 +27,13 @@ import java.io.IOException;
  */
 
 class VenueWidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
-    private static final String LOG_TAG=VenueWidgetDataProvider.class.getSimpleName();
     private Context mContext = null;
     private Cursor cursor = null;
     private int appWidgetId;
 
-    VenueWidgetDataProvider(Context context,int widgetId){
-        mContext=context;
-        appWidgetId=widgetId;
+    VenueWidgetDataProvider(Context context, int widgetId) {
+        mContext = context;
+        appWidgetId = widgetId;
     }
 
     @Override
@@ -43,12 +43,12 @@ class VenueWidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public void onDataSetChanged() {
-        Log.d(LOG_TAG,"onDataSetChanged=");
-        if (cursor!=null){
+        Log.d("WidgetDebug", "onDataSetChanged=");
+        if (cursor != null) {
             cursor.close();
         }
-        final long identityToken= Binder.clearCallingIdentity();
-        cursor=mContext.getContentResolver().query(VenueContract.VenueEntry.CONTENT_URI,VenueContract.VenueEntry.VENUE_COLUMNS,null,null,VenueContract.VenueEntry.NAME_COLUMN);
+        final long identityToken = Binder.clearCallingIdentity();
+        cursor = mContext.getContentResolver().query(VenueContract.VenueEntry.CONTENT_URI, VenueContract.VenueEntry.VENUE_COLUMNS, null, null, VenueContract.VenueEntry.NAME_COLUMN);
         Binder.restoreCallingIdentity(identityToken);
     }
 
@@ -62,8 +62,8 @@ class VenueWidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public int getCount() {
-        int count=(cursor==null)?0:cursor.getCount();
-        Log.d(LOG_TAG,"Count="+count);
+        int count = (cursor == null) ? 0 : cursor.getCount();
+        Log.d("WidgetDebug", "Count=" + count);
         return count;
     }
 
@@ -73,26 +73,28 @@ class VenueWidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
             return null;
         }
 
-        RemoteViews view = new RemoteViews(mContext.getPackageName(), R.layout.venue_item_list_content);
-
+        RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.venue_item_list_content);
         if (this.cursor.moveToPosition(i)) {
             String name = cursor.getString(VenueContract.VenueEntry.POSITION_NAME);
             String imageUrl = cursor.getString(VenueContract.VenueEntry.POSITION_IMAGE);
             double rating = cursor.getDouble(VenueContract.VenueEntry.POSITION_RATING);
-            double latitude = cursor.getDouble(VenueContract.VenueEntry.POSITION_LATITUDE);
-            double longitude = cursor.getDouble(VenueContract.VenueEntry.POSITION_LONGITUDE);
-            String address = cursor.getString(VenueContract.VenueEntry.POSITION_ADDRESS);
-            view.setTextViewText(R.id.itemNameView, String.valueOf(name));
-            view.setTextViewText(R.id.itemIconView, String.valueOf(address));
-            view.setTextViewText(R.id.itemRatingView, String.valueOf(rating));
+            double latitude = cursor.getDouble(VenueEntry.POSITION_LATITUDE);
+            double longitude = cursor.getDouble(VenueEntry.POSITION_LONGITUDE);
+            String address = cursor.getString(VenueEntry.POSITION_ADDRESS);
+
+            remoteViews.setTextViewText(R.id.itemNameView, String.valueOf(name));
+            remoteViews.setTextViewText(R.id.itemAddressView, String.valueOf(address));
+            remoteViews.setTextViewText(R.id.itemRatingView, String.valueOf(rating));
+
             if (!TextUtils.isEmpty(imageUrl)) {
                 try {
-                    Bitmap bitmap = Picasso.with(mContext).load(imageUrl).get();
-                    view.setImageViewBitmap(R.id.itemIconView, bitmap);
+                    Bitmap b = Picasso.with(mContext).load(imageUrl).get();
+                    remoteViews.setImageViewBitmap(R.id.itemIconView, b);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
+
             FoursquareLocation location = new FoursquareLocation();
             location.lat = latitude;
             location.lng = longitude;
@@ -108,9 +110,11 @@ class VenueWidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
 
             final Intent fillInIntent = new Intent();
             fillInIntent.putExtra(VenueItemDetailFragment.ARG_ITEM_ID, fourSquareResult);
-            view.setOnClickFillInIntent(R.id.venue_list_item, fillInIntent);
+            remoteViews.setOnClickFillInIntent(R.id.venue_list_item, fillInIntent);
         }
-        return view;
+
+
+        return remoteViews;
     }
 
     @Override

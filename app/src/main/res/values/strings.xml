@@ -1,4 +1,8 @@
 <resources>
+    <string name="foursquare_client_id" templateMergeStrategy="preserve" translatable="false">LE1LKPJZWSPNQVVEQEYI0A24DEH54KZVVIT1WI1CB3GOUJVT</string>
+    <string name="foursquare_client_secret" templateMergeStrategy="preserve" translatable="false">WCFHNL3KMOBJH5QRREUQZ3FFAQLV10KRUJ445LCBROYESFPN</string>
+    <string name="google_maps_key" translatable="false">AIzaSyAz8KqoIZ3-6apw8zG1Vi9GIYPln1QXHCs</string>
+
     <string name="app_name">WorldTraveller\'sGuide</string>
     <string name="action_settings">Settings</string>
     <string name="internet_connection_message">No internet service is available</string>
@@ -13,9 +17,6 @@
     <string name="open_venue_in_map_button_text">Open venue in map</string>
     <string name="title_activity_saved_locations">SavedLocationsActivity</string>
     <string name="title_activity_maps">Map</string>
-    <string name="foursquare_client_id" templateMergeStrategy="preserve" translatable="false">LE1LKPJZWSPNQVVEQEYI0A24DEH54KZVVIT1WI1CB3GOUJVT</string>
-    <string name="foursquare_client_secret" templateMergeStrategy="preserve" translatable="false">WCFHNL3KMOBJH5QRREUQZ3FFAQLV10KRUJ445LCBROYESFPN</string>
-    <string name="google_maps_key" translatable="false">AIzaSyBwYPf5m2CcuC7hWRDrSeRgGZHtU8ugxiI</string>
     <string name="search_query_edit_text_prompt">Enter search term</string>
     <string name="search_query_edit_text_content_description">Enter search query</string>
     <string name="location_edit_text_prompt">Near me</string>
