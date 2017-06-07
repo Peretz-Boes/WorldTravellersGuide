@@ -32,4 +32,13 @@
     <string name="venue_widget_icon_content_description">Venue widget icon</string>
     <string name="venue_widget_content_description">Results of a search for a random venue</string>
     <string name="no_data_found_error_message">No data found</string>
+    <string name="web_browser_not_found_error_message">You need to install a web browser to use this feature</string>
+    <string name="snippet_text">View on Foursquare</string>
+    <string name="rating_view_additional_text"/>
+    <string name="error_message_title">Error</string>
+    <string name="error_in_search_error_message">There was some error in performing search</string>
+    <string name="location_unavailable_error_message">Location is not available.  Please provide city to perform nearby search</string>
+    <string name="positive_button_text">OK</string>
+    <string name="progress_dialog_searching_text">Searching</string>
+    <string name="data_insertion_error_message">An error has occurred inserting the data</string>
 </resources>

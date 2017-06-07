@@ -1,11 +1,15 @@
 package com.example.android.worldtravellersguide;
 
 import android.Manifest;
+import android.app.LoaderManager;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.worldtravellersguide.database.VenueContract;
 import com.example.android.worldtravellersguide.model.FourSquareResults;
 import com.example.android.worldtravellersguide.model.FoursquareRootJSON;
 import com.example.android.worldtravellersguide.network.RetroApiClient;
@@ -51,10 +56,12 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static android.os.Build.VERSION.SDK_INT;
+import static android.util.Log.d;
 
 
-public class VenueItemListActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class VenueItemListActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final int VENUE_LOADER_ID=0;
     private static final int PERMISSION_ACCESS_FINE_LOCATION = 1;
     public static final String LOG_TAG = VenueItemListActivity.class.getSimpleName();
     private boolean mTwoPane;
@@ -65,6 +72,7 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
     private EditText searchTextEditor;
     private EditText nearbyEditor;
     private SimpleItemRecyclerViewAdapter simpleItemRecyclerViewAdapter;
+    private Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +96,8 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
         }
 
         googleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
-
+        getLoaderManager().initLoader(VENUE_LOADER_ID,null,this);
+        d(LOG_TAG,"onCreate executed");
     }
 
     @Override
@@ -121,6 +130,23 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         isConnected = false;
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return new CursorLoader(this, VenueContract.VenueEntry.CONTENT_URI,VenueContract.VenueEntry.VENUE_COLUMNS,null,null,VenueContract.VenueEntry.NAME_COLUMN);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if(cursor!=null) {
+
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 
     private class SearchTextWatcher implements TextWatcher {
@@ -166,11 +192,11 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
             if (fourSquareResults.venue != null) {
                 holder.itemNameView.setText(fourSquareResults.venue.name);
                 holder.itemAddressView.setText(fourSquareResults.venue.location.address);
-                holder.itemRatingView.setText("" + fourSquareResults.venue.rating);
+                holder.itemRatingView.setText(getString(R.string.rating_view_additional_text) + fourSquareResults.venue.rating);
             }
 
             if (fourSquareResults.photo != null) {
-                String photoUrl = fourSquareResults.photo.getFormattedPhotoUrl();
+                String photoUrl=fourSquareResults.photo.getFormattedPhotoUrl();
                 if (!photoUrl.isEmpty()) {
                     Picasso.with(VenueItemListActivity.this).load(photoUrl).into(holder.itemIconView);
                 }
@@ -194,7 +220,7 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
                             String iconViewTransitionName = getString(R.string.transition_tag) + String.valueOf(getItemId(holder.getAdapterPosition()));
                             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(VenueItemListActivity.this, transitionImageView, iconViewTransitionName);
                             ActivityCompat.startActivity(VenueItemListActivity.this, intent, options.toBundle());
-                            Log.d(LOG_TAG, "Transition complete");
+                            d(LOG_TAG, "Transition complete");
                         } else {
                             context.startActivity(intent);
                         }
@@ -226,7 +252,6 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
                 itemRatingView = (TextView) view.findViewById(R.id.itemRatingView);
             }
 
-
         }
 
         private void refreshItems(List<FourSquareResults> items) {
@@ -237,9 +262,22 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
             Log.d(LOG_TAG, "Result data inserted into database");
         }
 
+        private void loadData(ViewHolder holder){
+            if(cursor!=null){
+                String name=cursor.getString(VenueContract.VenueEntry.POSITION_NAME);
+                String address=cursor.getString(VenueContract.VenueEntry.POSITION_ADDRESS);
+                String imagePath=cursor.getString(VenueContract.VenueEntry.POSITION_IMAGE);
+                double rating=cursor.getDouble(VenueContract.VenueEntry.POSITION_RATING);
+                holder.itemNameView.setText(name);
+                holder.itemAddressView.setText(address);
+                holder.itemRatingView.setText(""+rating);
+                Picasso.with(VenueItemListActivity.this).load(imagePath).into(holder.itemIconView);
+            }
+        }
+
     }
 
-    private void handleRuntimePermission() {
+    private void handleRuntimePermission(){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_ACCESS_FINE_LOCATION);
         }
@@ -255,7 +293,7 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
     private void showProgressDialog() {
         if (progressDialog == null) {
             progressDialog = new ProgressDialog(this);
-            progressDialog.setMessage("Searching");
+            progressDialog.setMessage(getString(R.string.progress_dialog_searching_text));
             progressDialog.setCancelable(false);
             progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.setIndeterminate(true);
@@ -273,7 +311,7 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(message);
         builder.setCancelable(false);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.positive_button_text, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -304,7 +342,7 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getApplicationContext(), "Location is not available.  Please provide city to perform nearby search", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), R.string.location_unavailable_error_message, Toast.LENGTH_LONG).show();
                 }
             });
             return;
@@ -328,7 +366,7 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
             @Override
             public void onFailure(Call<FoursquareRootJSON> call, Throwable t) {
                 hideProgressDialog();
-                showMessageAlertWithOkButton("Error", "There was some error in performing search");
+                showMessageAlertWithOkButton(getString(R.string.error_message_title), getString(R.string.error_in_search_error_message));
             }
         });
     }

@@ -61,12 +61,12 @@ public class VenueItemDetailFragment extends Fragment implements OnMapReadyCallb
         map=googleMap;
         LatLng venueLatLng=new LatLng(mItem.venue.location.lat,mItem.venue.location.lng);
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(venueLatLng,16));
-        Marker marker=map.addMarker(new MarkerOptions().position(venueLatLng).title(mItem.venue.name).snippet("View on Foursquare"));
+        Marker marker=map.addMarker(new MarkerOptions().position(venueLatLng).title(mItem.venue.name).snippet(getString(R.string.snippet_text)));
         if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
             if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED){
                 map.setMyLocationEnabled(true);
             }else {
-                Toast.makeText(getContext(),"You need to enable location for this feature to work",Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(),R.string.location_permission_explanation_message,Toast.LENGTH_LONG).show();
             }
         } else {
             map.setMyLocationEnabled(true);
@@ -90,7 +90,7 @@ public class VenueItemDetailFragment extends Fragment implements OnMapReadyCallb
         try {
             startActivity(intent);
         }catch (ActivityNotFoundException exception){
-            Toast.makeText(getContext(),"You need to install a web browser to use this feature",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), R.string.web_browser_not_found_error_message,Toast.LENGTH_LONG).show();
         }
     }
 }
