@@ -5,7 +5,7 @@ android {
         config {
             keyAlias 'WorldTravellersGuideAlias'
             keyPassword 'password'
-            storeFile file('C:/Users/Peretz/AndroidStudioProjects/WorldTravellersGuide/worldtravellersguidekeystore.jks')
+            storeFile file('keystores/worldtravellersguidekeystore.jks')
             storePassword 'password'
         }
     }
@@ -49,6 +49,5 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.google.android.gms:play-services-maps:10.2.4'
     compile 'com.google.android.gms:play-services-location:10.2.4'
-    compile 'com.google.gms:google-services:3.1.0'
     testCompile 'junit:junit:4.12'
 }

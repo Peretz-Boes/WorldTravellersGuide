@@ -1,15 +1,11 @@
 package com.example.android.worldtravellersguide;
 
 import android.Manifest;
-import android.app.LoaderManager;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,7 +31,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.android.worldtravellersguide.database.VenueContract;
 import com.example.android.worldtravellersguide.model.FourSquareResults;
 import com.example.android.worldtravellersguide.model.FoursquareRootJSON;
 import com.example.android.worldtravellersguide.network.RetroApiClient;
@@ -59,7 +54,7 @@ import static android.os.Build.VERSION.SDK_INT;
 import static android.util.Log.d;
 
 
-public class VenueItemListActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,LoaderManager.LoaderCallbacks<Cursor> {
+public class VenueItemListActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int VENUE_LOADER_ID=0;
     private static final int PERMISSION_ACCESS_FINE_LOCATION = 1;
@@ -72,7 +67,6 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
     private EditText searchTextEditor;
     private EditText nearbyEditor;
     private SimpleItemRecyclerViewAdapter simpleItemRecyclerViewAdapter;
-    private Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,8 +90,7 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
         }
 
         googleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
-        getLoaderManager().initLoader(VENUE_LOADER_ID,null,this);
-        d(LOG_TAG,"onCreate executed");
+        Log.d(LOG_TAG,"onCreate executed");
     }
 
     @Override
@@ -130,23 +123,6 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         isConnected = false;
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this, VenueContract.VenueEntry.CONTENT_URI,VenueContract.VenueEntry.VENUE_COLUMNS,null,null,VenueContract.VenueEntry.NAME_COLUMN);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if(cursor!=null) {
-
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
     }
 
     private class SearchTextWatcher implements TextWatcher {
@@ -260,19 +236,6 @@ public class VenueItemListActivity extends AppCompatActivity implements GoogleAp
             InsertWidgetDataAsyncTask insertWidgetDataAsyncTask = new InsertWidgetDataAsyncTask(getApplicationContext(), items);
             insertWidgetDataAsyncTask.execute();
             Log.d(LOG_TAG, "Result data inserted into database");
-        }
-
-        private void loadData(ViewHolder holder){
-            if(cursor!=null){
-                String name=cursor.getString(VenueContract.VenueEntry.POSITION_NAME);
-                String address=cursor.getString(VenueContract.VenueEntry.POSITION_ADDRESS);
-                String imagePath=cursor.getString(VenueContract.VenueEntry.POSITION_IMAGE);
-                double rating=cursor.getDouble(VenueContract.VenueEntry.POSITION_RATING);
-                holder.itemNameView.setText(name);
-                holder.itemAddressView.setText(address);
-                holder.itemRatingView.setText(""+rating);
-                Picasso.with(VenueItemListActivity.this).load(imagePath).into(holder.itemIconView);
-            }
         }
 
     }

@@ -4,16 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.os.Binder;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.example.android.worldtravellersguide.R;
 import com.example.android.worldtravellersguide.VenueItemDetailFragment;
-import com.example.android.worldtravellersguide.database.VenueContract;
 import com.example.android.worldtravellersguide.database.VenueContract.VenueEntry;
 import com.example.android.worldtravellersguide.model.FourSquareResults;
 import com.example.android.worldtravellersguide.model.FoursquareLocation;
@@ -21,15 +20,20 @@ import com.example.android.worldtravellersguide.model.FoursquareVenue;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Peretz on 2017-04-05.
  */
 
 class VenueWidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
+    public static final String LOG_TAG=VenueWidgetDataProvider.class.getSimpleName();
+    public static final int CURSOR_LOADER_ID=1;
     private Context mContext = null;
     private Cursor cursor = null;
     private int appWidgetId;
+    List<Venue> venues=new ArrayList<>();
 
     VenueWidgetDataProvider(Context context, int widgetId) {
         mContext = context;
@@ -38,83 +42,92 @@ class VenueWidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public void onCreate() {
-        // Nothing to do
+        Loader<Cursor> loader=new CursorLoader(mContext,VenueEntry.CONTENT_URI, VenueEntry.VENUE_COLUMNS,null,null,VenueEntry.NAME_COLUMN);
+        loader.startLoading();
+        loader.registerListener(CURSOR_LOADER_ID, new Loader.OnLoadCompleteListener<Cursor>() {
+            @Override
+            public void onLoadComplete(Loader<Cursor> loader, Cursor data) {
+                if (data.moveToFirst()){
+                    while (data.moveToNext()){
+                        Venue venue=new Venue();
+                        venue.setName(data.getString(data.getColumnIndex("name")));
+                        venue.setAddress(data.getString(data.getColumnIndex("address")));
+                        venue.setImageUrl(data.getString(data.getColumnIndex("image")));
+                        venue.setRating(data.getDouble(data.getColumnIndex("rating")));
+                        venue.setLatitude(data.getDouble(data.getColumnIndex("latitude")));
+                        venue.setLongitude(data.getDouble(data.getColumnIndex("longitude")));
+                        venues.add(venue);
+                    }
+                }
+                onDataSetChanged();
+            }
+        });
     }
 
     @Override
     public void onDataSetChanged() {
-        Log.d("WidgetDebug", "onDataSetChanged=");
-        if (cursor != null) {
-            cursor.close();
+        Log.d(LOG_TAG,"onDataSetChanged: ");
+        for (Venue venue:venues){
+            Log.d(LOG_TAG,"onDataSetChanged: venue: "+venue.toString());
         }
-        final long identityToken = Binder.clearCallingIdentity();
-        cursor = mContext.getContentResolver().query(VenueContract.VenueEntry.CONTENT_URI, VenueContract.VenueEntry.VENUE_COLUMNS, null, null, VenueContract.VenueEntry.NAME_COLUMN);
-        Binder.restoreCallingIdentity(identityToken);
     }
 
     @Override
     public void onDestroy() {
-        if (cursor != null) {
-            cursor.close();
-            cursor = null;
-        }
+
     }
 
     @Override
     public int getCount() {
-        int count = (cursor == null) ? 0 : cursor.getCount();
-        Log.d("WidgetDebug", "Count=" + count);
+        int count=venues.size();
+        Log.d(LOG_TAG,"getCount: count: "+count);
         return count;
     }
 
     @Override
     public RemoteViews getViewAt(int i) {
-        if (i == AdapterView.INVALID_POSITION || cursor == null || !cursor.moveToPosition(i)) {
-            return null;
-        }
-
         RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.venue_item_list_content);
-        if (this.cursor.moveToPosition(i)) {
-            String name = cursor.getString(VenueContract.VenueEntry.POSITION_NAME);
-            String imageUrl = cursor.getString(VenueContract.VenueEntry.POSITION_IMAGE);
-            double rating = cursor.getDouble(VenueContract.VenueEntry.POSITION_RATING);
-            double latitude = cursor.getDouble(VenueEntry.POSITION_LATITUDE);
-            double longitude = cursor.getDouble(VenueEntry.POSITION_LONGITUDE);
-            String address = cursor.getString(VenueEntry.POSITION_ADDRESS);
+        Venue venue = venues.get(i);
+        String name = venue.getName();
+        String imageUrl = venue.getImageUrl();
+        double rating = venue.getRating();
+        double latitude = venue.getLatitude();
+        double longitude = venue.getLongitude();
+        String address = venue.getAddress();
 
-            remoteViews.setTextViewText(R.id.itemNameView, String.valueOf(name));
-            remoteViews.setTextViewText(R.id.itemAddressView, String.valueOf(address));
-            remoteViews.setTextViewText(R.id.itemRatingView, String.valueOf(rating));
+        remoteViews.setTextViewText(R.id.itemNameView, name);
+        remoteViews.setTextViewText(R.id.itemAddressView, address);
+        remoteViews.setTextViewText(R.id.itemRatingView, String.valueOf(rating));
 
-            if (!TextUtils.isEmpty(imageUrl)) {
-                try {
-                    Bitmap b = Picasso.with(mContext).load(imageUrl).get();
-                    remoteViews.setImageViewBitmap(R.id.itemIconView, b);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        if (!TextUtils.isEmpty(imageUrl)) {
+            try {
+                Bitmap b = Picasso.with(mContext).load(imageUrl).get();
+                remoteViews.setImageViewBitmap(R.id.itemIconView, b);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-            FoursquareLocation location = new FoursquareLocation();
-            location.lat = latitude;
-            location.lng = longitude;
-            location.address = address;
-
-            FoursquareVenue foursquareVenue = new FoursquareVenue();
-            foursquareVenue.name = name;
-            foursquareVenue.rating = rating;
-            foursquareVenue.location = location;
-
-            FourSquareResults fourSquareResult = new FourSquareResults();
-            fourSquareResult.venue = foursquareVenue;
-
-            final Intent fillInIntent = new Intent();
-            fillInIntent.putExtra(VenueItemDetailFragment.ARG_ITEM_ID, fourSquareResult);
-            remoteViews.setOnClickFillInIntent(R.id.venue_list_item, fillInIntent);
         }
+
+        FoursquareLocation location = new FoursquareLocation();
+        location.lat = latitude;
+        location.lng = longitude;
+        location.address = address;
+
+        FoursquareVenue foursquareVenue = new FoursquareVenue();
+        foursquareVenue.name = name;
+        foursquareVenue.rating = rating;
+        foursquareVenue.location = location;
+
+        FourSquareResults fourSquareResult = new FourSquareResults();
+        fourSquareResult.venue = foursquareVenue;
+
+        final Intent fillInIntent = new Intent();
+        fillInIntent.putExtra(VenueItemDetailFragment.ARG_ITEM_ID, fourSquareResult);
+        remoteViews.setOnClickFillInIntent(R.id.venue_list_item, fillInIntent);
 
 
         return remoteViews;
+
     }
 
     @Override
@@ -129,15 +142,69 @@ class VenueWidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public long getItemId(int i) {
-        if (cursor.moveToPosition(i)) {
-            return cursor.getInt(VenueContract.VenueEntry.POSITION_ID);
-        }
         return i;
     }
 
     @Override
     public boolean hasStableIds() {
         return true;
+    }
+
+    public class Venue{
+        String name;
+        String address;
+        double rating;
+        double latitude;
+        double longitude;
+        String imageUrl;
+
+        public String getAddress() {
+            return address;
+        }
+
+        public void setAddress(String address) {
+            this.address = address;
+        }
+
+        public String getImageUrl() {
+            return imageUrl;
+        }
+
+        public void setImageUrl(String imageUrl) {
+            this.imageUrl = imageUrl;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public double getRating() {
+            return rating;
+        }
+
+        public void setRating(double rating) {
+            this.rating = rating;
+        }
+
+        public double getLatitude() {
+            return latitude;
+        }
+
+        public void setLatitude(double latitude) {
+            this.latitude = latitude;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
+
+        public void setLongitude(double longitude) {
+            this.longitude = longitude;
+        }
     }
 
 }

@@ -24,11 +24,11 @@ public class VenueDatabaseHelper extends SQLiteOpenHelper {
         final String CREATE_VENUE_TABLE = "CREATE TABLE " + VenueContract.VenueEntry.TABLE_NAME + " (" +
                 VenueContract.VenueEntry._ID + " TEXT NOT NULL," +
                 VenueContract.VenueEntry.NAME_COLUMN + " TEXT NOT NULL," +
-                VenueContract.VenueEntry.IMAGE_COLUMN + " TEXT," +
+                VenueContract.VenueEntry.IMAGE_COLUMN + " TEXT NOT NULL," +
                 VenueContract.VenueEntry.RATING_COLUMN + " REAL NOT NULL," +
                 VenueEntry.LAT_COLUMN + " REAL NOT NULL," +
                 VenueEntry.LONG_COLUMN + " REAL NOT NULL," +
-                VenueEntry.ADDRESS_COLUMN + " TEXT" + ")";
+                VenueEntry.ADDRESS_COLUMN + " TEXT NOT NULL" + ")";
         sqLiteDatabase.execSQL(CREATE_VENUE_TABLE);
     }
 

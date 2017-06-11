@@ -33,12 +33,6 @@ public class VenueContract {
         public static final String ADDRESS_COLUMN="address";
 
         public static final int POSITION_ID=0;
-        public static final int POSITION_NAME=1;
-        public static final int POSITION_IMAGE=2;
-        public static final int POSITION_RATING=3;
-        public static final int POSITION_LATITUDE=4;
-        public static final int POSITION_LONGITUDE=5;
-        public static final int POSITION_ADDRESS=6;
 
         public static final String[] VENUE_COLUMNS={_ID,NAME_COLUMN,IMAGE_COLUMN,RATING_COLUMN,LAT_COLUMN,LONG_COLUMN,ADDRESS_COLUMN};
 
